@@ -1,0 +1,3 @@
+[submodule "bpf_test_tool"]
+	path = bpf_test_tool
+	url = git@github.com:bpfverif/bpf_test_tool.git
