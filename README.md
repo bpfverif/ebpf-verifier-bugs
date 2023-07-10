@@ -16,12 +16,9 @@ Our tool Agni has synthesized several POC eBPF programs (67 for kernel v5.8). Al
 
 ## Recreating verifier bugs
 
-First clone this repository and update the `bpf_test_tool` submodule.
+First clone this repository and the `bpf_test_tool` submodule.
 ```
-git clone https://github.com/bpfverif/ebpf-verifier-bugs.git
-cd ebpf-verifier-bugs
-git submodule init
-git submodule update
+git clone --recurse-submodules https://github.com/bpfverif/ebpf-verifier-bugs.git
 ```
 
 Enter the `bpf_test_tool` directory
