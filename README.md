@@ -29,19 +29,19 @@ cd bpf_test_tool
 
 ### Example 1: An ALU instruction
 
-Let's try to load the POC eBPF program `bpf_prog_5.8_sub_s64.txt`, which manifests a bug in the `BPF_SUB` instruction and in the `signed 64` abstract domain. The script `bpf_test.sh` is useful.
+Let's try to load the POC eBPF program `bpf_prog_5.8_sub_u64.txt`, which manifests a bug in the `SUB` instruction and in the `unsigned 64` abstract domain. The script `bpf_test.sh` is useful.
 
 ```
-./bpf_test.sh ../5.8/bpf_prog_5.8_sub_s64.txt
+./bpf_test.sh ../5.8/bpf_prog_5.8_sub_u64.txt
 ```
 
 This should produce the following output. 
 
 ![Alt text](images/image2.png)
 
-**Reading the output.** The script only prints out lines `6` and `7` from the verifier log, omitting the other lines. (These "relevant" line numbers were inserted as comments into `bpf_prog_5.8_sub_s64.txt` by Agni.) Line `6` corresponds to the instruction involving the `BPF_SUB`: `r1 -= r2`. Line `7` consists of the verifier's beliefs in the values of the registers immediately after executing the instruction (more precisely, the abstract domain values used to track the values in the registers). Finallly, after the second set of dashed lines, the _actual_ values in 10 eBPF registers (`r0` through `r9`) are printed. 
+**Reading the output.** The script only prints out lines `6` and `7` from the verifier log, omitting the other lines. (These "relevant" line numbers were inserted as comments into `bpf_prog_5.8_sub_u64.txt` by Agni.) Line `6` corresponds to the instruction involving the `SUB`: `r1 -= r2`. Line `7` consists of the verifier's beliefs in the values of the registers immediately after executing the instruction (more precisely, the abstract domain values used to track the values in the registers). Finally, after the second set of dashed lines, the _actual_ values in 10 eBPF registers (`r0` through `r9`) are printed. 
 
-**The bug.** Note that the filename `bpf_prog_5.8_sub_s64.txt` mentiones the abstract domain that this program violates soundness in: `s64`, so we have to look for `smin_value`, `smax_value` in the verifier log. However in this particular example, they are not printed. This is because the `print_verifier_log` function in `verifier.c` skips printing `smin_value` and `smax_value` if they are equal to `umin_value` and `umax_value` respectively. Knowing this, the error in the analysis of `SUB` in `signed 64` domain is clear: `smin_value` is greater than `smax_value`. This should never be the case in a sound analysis.
+**The bug.** Note that the filename `bpf_prog_5.8_sub_u64.txt` mentiones the abstract domain that this program violates soundness in: `u64`, so we have to look for `umin_value`, `umax_value` in the verifier log. The error in the analysis of `SUB` in the `unsigned 64` domain is clear: `umin_value` is greater than `umax_value`. This should never be the case in a sound analysis.
 
 ### Example 2: A JUMP instruction
 
